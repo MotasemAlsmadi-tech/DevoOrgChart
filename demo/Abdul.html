@@ -1,153 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Organization Chart Plugin</title>
-  <link rel="icon" href="img/logo.png">
-  <link rel="stylesheet" href="css/fontawesome.min.css" >
-  <link rel="stylesheet" href="./css/jquery.orgchart.min.css">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/Abdul.css">
+  <head>
+    <meta charset="utf-8" />
+    <title>Organization Chart Plugin</title>
+    <link rel="icon" href="img/logo.png" />
+    <link rel="stylesheet" href="css/fontawesome.min.css" />
+    <link rel="stylesheet" href="./css/jquery.orgchart.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/Abdul.css" />
+  </head>
+  <body>
+    <div id="edit-panel" class="view-state">
+      <input type="text" id="key-word" placeholder="search" />
+      <button type="button" id="btn-filter-node">Filter</button>
+      <button type="button" id="btn-cancel">Cancel</button>
+      <input
+        type="text"
+        id="selected-node"
+        placeholder="please select node"
+        readonly="true"
+      />
+      <button type="button" id="btn-report-path">Draw report path</button>
+      <button type="button" id="btn-reset">Reset</button>
+    </div>
+    <div id="chart-container"></div>
 
-</head>
-<body>
-  <div id="edit-panel" class="view-state">
-    <input type="text" id="key-word" placeholder="search">
-    <button type="button" id="btn-filter-node">Filter</button>
-    <button type="button" id="btn-cancel">Cancel</button>
-  </div>
-  <div id="chart-container"></div>
+    <script
+      type="text/javascript"
+      src="https://code.jquery.com/jquery-3.6.2.js"
+    ></script>
 
-  <script type="text/javascript" src="/js/jquery.min.js"></script>
-  <script type="text/javascript" src="/js/jquery.orgchart.js"></script>
-  <script type="text/javascript">
-    function loopChart ($hierarchy) {
-      var $siblings = $hierarchy.children('.nodes').children('.hierarchy');
-      if ($siblings.length) {
-        $siblings.filter(':not(.hidden)').first().addClass('first-shown')
-          .end().last().addClass('last-shown');
-      }
-      $siblings.each(function(index, sibling) {
-        loopChart($(sibling));
-      });
-    }
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.orgchart.js"></script>
+    <script type="text/javascript">
+      $(function () {
+        var datascource = {
+          name: "Lao Lao",
+          title: "general manager",
+          className: "first-level",
+          children: [
+            {
+              name: "Bo Miao",
+              title: "department manager",
+              className: "second-level",
+              children: [
+                {
+                  name: "Li Xin",
+                  title: "senior engineer",
+                  className: "third-level",
+                  children: [
+                    {
+                      name: "To To",
+                      title: "engineer",
+                      className: "fourth-level",
+                    },
+                    {
+                      name: "Fei Fei",
+                      title: "engineer",
+                      className: "fourth-level",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: "Su Miao",
+              title: "department manager",
+              className: "second-level",
+              children: [
+                {
+                  name: "Tie Hua",
+                  title: "senior engineer",
+                  className: "third-level",
+                },
+                {
+                  name: "Hei Hei",
+                  title: "senior engineer",
+                  className: "third-level",
+                  children: [
+                    {
+                      name: "Pang Pang",
+                      title: "engineer",
+                      className: "fourth-level",
+                    },
+                    {
+                      name: "Dan Dan",
+                      title: "UE engineer",
+                      className: "fourth-level",
+                      children: [
+                        {
+                          name: "Er Dan",
+                          title: "engineer",
+                          className: "fifth-level",
+                        },
+                        {
+                          name: "San Dan",
+                          title: "engineer",
+                          className: "fifth-level",
+                          children: [
+                            {
+                              name: "Si Dan",
+                              title: "intern",
+                              className: "sixth-level",
+                            },
+                            {
+                              name: "Wu Dan",
+                              title: "intern",
+                              className: "sixth-level",
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              name: "Chun Miao",
+              title: "department manager",
+              className: "second-level",
+              children: [
+                {
+                  name: "Bing Qin",
+                  title: "senior engineer",
+                  className: "third-level",
+                },
+                {
+                  name: "Yue Yue",
+                  title: "senior engineer",
+                  className: "third-level",
+                  children: [
+                    {
+                      name: "Er Yue",
+                      title: "engineer",
+                      className: "fourth-level",
+                    },
+                    {
+                      name: "San Yue",
+                      title: "UE engineer",
+                      className: "fourth-level",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        };
 
-    function filterNodes(keyWord) {
-    if(!keyWord.length) {
-      window.alert('Please type key word firstly.');
-      return;
-    } else {
-      var $chart = $('.orgchart');
-      // disalbe the expand/collapse feture
-      $chart.addClass('noncollapsable');
-      // distinguish the matched nodes and the unmatched nodes according to the given key word
-      $chart.find('.node').filter(function(index, node) {
-          return $(node).text().toLowerCase().indexOf(keyWord) > -1;
-        }).addClass('matched')
-        .closest('.hierarchy').parents('.hierarchy').children('.node').addClass('retained');
-      // hide the unmatched nodes
-      $chart.find('.matched,.retained').each(function(index, node) {
-        $(node).removeClass('slide-up')
-          .closest('.nodes').removeClass('hidden')
-          .siblings('.hierarchy').removeClass('isChildrenCollapsed');
-        var $unmatched = $(node).closest('.hierarchy').siblings().find('.node:first:not(.matched,.retained)')
-          .closest('.hierarchy').addClass('hidden');
-      });
-      // hide the redundant descendant nodes of the matched nodes
-      $chart.find('.matched').each(function(index, node) {
-        if (!$(node).siblings('.nodes').find('.matched').length) {
-          $(node).siblings('.nodes').addClass('hidden')
-            .parent().addClass('isChildrenCollapsed');
+        // create the orgChart function
+        var oc = $("#chart-container").orgchart({
+          data: datascource,
+          nodeContent: "title",
+          verticalLevel: 5,
+          icons: {
+            theme: "fa-solid fa-sm",
+            expandToUp: "fa-angles-up",
+            collapseToDown: "fa-angles-down",
+            collapseToLeft: "fa-angles-left",
+            expandToRight: "fa-angles-right",
+            collapsed: "fa-circle-plus",
+            expanded: "fa-circle-minus",
+          },
+        });
+
+        // Ensure focused class is applied correctly
+        oc.$chart.on("click", ".node", function () {
+          oc.$chart.find(".node").removeClass("focused");
+          $(this).addClass("focused");
+          $("#selected-node").val($(this).children(".title").text());
+        });
+
+        // Report path functionality
+        $("#btn-report-path").on("click", function () {
+          var $selected = $("#chart-container").find(".node.focused");
+          if ($selected.length) {
+            $selected
+              .parents(".nodes")
+              .children(":has(.focused)")
+              .find(".node:first")
+              .each(function (index, superior) {
+                console.log(
+                  "Processing superior node:",
+                  $(superior).children(".title").text()
+                );
+                if (
+                  !$(superior)
+                    .find(".horizontalEdge:first")
+                    .closest(".node")
+                    .parent()
+                    .siblings()
+                    .is(".hidden")
+                ) {
+                  $(superior).find(".horizontalEdge:first").trigger("click");
+                }
+              });
+            $(this).prop("disabled", true);
+          } else {
+            alert("please select the node firstly");
+          }
+        });
+
+        // clear report path function
+        $("#btn-reset").on("click", function () {
+          $("#chart-container")
+            .find(".hidden")
+            .removeClass("hidden")
+            .end()
+            .find(".slide-up, .slide-right, .slide-left, .focused")
+            .removeClass("slide-up slide-right slide-left focused");
+          $("#chart-container")
+            .find(
+              ".isCollapsedSibling, .isChildrenCollapsed, .isSiblingsCollapsed"
+            )
+            .removeClass(
+              "isCollapsedSibling isChildrenCollapsed isSiblingsCollapsed"
+            );
+          $("#btn-report-path").prop("disabled", false);
+          $("#selected-node").val("");
+        });
+
+        // Filter functionality
+        function filterNodes(keyWord) {
+          if (!keyWord.length) {
+            window.alert("Please type key word firstly.");
+            return;
+          } else {
+            var $chart = $(".orgchart");
+            $chart.addClass("noncollapsable");
+            $chart
+              .find(".node")
+              .filter(function (index, node) {
+                return $(node).text().toLowerCase().indexOf(keyWord) > -1;
+              })
+              .addClass("matched")
+              .closest(".hierarchy")
+              .parents(".hierarchy")
+              .children(".node")
+              .addClass("retained");
+            $chart.find(".matched,.retained").each(function (index, node) {
+              $(node)
+                .removeClass("slide-up")
+                .closest(".nodes")
+                .removeClass("hidden")
+                .siblings(".hierarchy")
+                .removeClass("isChildrenCollapsed");
+              var $unmatched = $(node)
+                .closest(".hierarchy")
+                .siblings()
+                .find(".node:first:not(.matched,.retained)")
+                .closest(".hierarchy")
+                .addClass("hidden");
+            });
+            $chart.find(".matched").each(function (index, node) {
+              if (!$(node).siblings(".nodes").find(".matched").length) {
+                $(node)
+                  .siblings(".nodes")
+                  .addClass("hidden")
+                  .parent()
+                  .addClass("isChildrenCollapsed");
+              }
+            });
+            loopChart($chart.find(".hierarchy:first"));
+          }
+        }
+
+        function loopChart($hierarchy) {
+          var $siblings = $hierarchy.children(".nodes").children(".hierarchy");
+          if ($siblings.length) {
+            $siblings
+              .filter(":not(.hidden)")
+              .first()
+              .addClass("first-shown")
+              .end()
+              .last()
+              .addClass("last-shown");
+          }
+          $siblings.each(function (index, sibling) {
+            loopChart($(sibling));
+          });
+        }
+
+        $("#btn-filter-node").on("click", function () {
+          filterNodes($("#key-word").val());
+        });
+
+        $("#btn-cancel").on("click", function () {
+          clearFilterResult();
+          $("#key-word").val("");
+        });
+
+        $("#key-word").on("keyup", function (event) {
+          if (event.which === 13) {
+            filterNodes(this.value);
+          } else if (event.which === 8 && this.value.length === 0) {
+            clearFilterResult();
+          }
+        });
+
+        // clear search or filter function
+        function clearFilterResult() {
+          $(".orgchart")
+            .removeClass("noncollapsable")
+            .find(".node")
+            .removeClass("matched retained")
+            .end()
+            .find(".hidden, .isChildrenCollapsed, .first-shown, .last-shown")
+            .removeClass("hidden isChildrenCollapsed first-shown last-shown")
+            .end()
+            .find(".slide-up, .slide-left, .slide-right")
+            .removeClass("slide-up slide-right slide-left");
         }
       });
-      // loop chart and adjust lines
-      loopChart($chart.find('.hierarchy:first'));
-    }
-  }
-
-  function clearFilterResult() {
-    $('.orgchart').removeClass('noncollapsable')
-      .find('.node').removeClass('matched retained')
-      .end().find('.hidden, .isChildrenCollapsed, .first-shown, .last-shown').removeClass('hidden isChildrenCollapsed first-shown last-shown')
-      .end().find('.slide-up, .slide-left, .slide-right').removeClass('slide-up slide-right slide-left');
-  }
-
-  $(function() {
-
-    var datascource = {
-      'id': '1',
-      'name': 'Lao Lao',
-      'title': 'general manager',
-      'className': 'first',
-      'children': [
-        { 'id': '2', 'name': 'Bo Miao', 'title': 'department manager', 'className': 'second-level'},
-        { 'id': '3', 'name': 'Su Miao', 'title': 'department manager', 'className': 'second-level',
-          'children': [
-            { 'id': '4', 'name': 'Tie Hua', 'title': 'senior engineer', 'className': 'third-level' },
-            { 'id': '5', 'name': 'Hei Hei', 'title': 'senior engineer', 'className': 'third-level',
-              'children': [
-                { 'id': '6', 'name': 'Pang Pang', 'title': 'engineer', 'className': 'fourth-level'},
-                { 'id': '7', 'name': 'Dan Dan', 'title': 'UE engineer', 'className': 'fourth-level' ,
-                'children': [
-                  { 'id': '8', 'name': 'Er Dan', 'title': 'engineer', 'className': 'fifth-level' },
-                  { 'id': '9', 'name': 'San Dan', 'title': 'engineer', 'className': 'fifth-level',
-                    'children': [
-                      { 'id': '10', 'name': 'Si Dan', 'title': 'intern', 'className': 'sixth-level' },
-                      { 'id': '11', 'name': 'Wu Dan', 'title': 'intern', 'className': 'sixth-level' }
-                    ]
-                  }
-                ]}
-              ]
-            }
-          ]
-        },
-        { 'id': '13', 'name': 'Chun Miao', 'title': 'department manager', 'hybrid': true, 'className': 'second-level',
-          'children': [
-            { 'id': '14', 'name': 'Bing Qin', 'title': 'senior engineer', 'className': 'third-level'},
-            { 'id': '15', 'name': 'Yue Yue', 'title': 'senior engineer', 'className': 'third-level',
-              'children': [
-                { 'id': '16', 'name': 'Er Yue', 'title': 'engineer', 'className': 'fourth-level' },
-                { 'id': '17', 'name': 'San Yue', 'title': 'UE engineer', 'className': 'fourth-level' }
-              ]
-            }
-          ]
-        }
-      ]
-    };
-
-    $('#chart-container').orgchart({
-      'data' : datascource,
-      'verticalLevel': 5,
-      'nodeContent': 'title',
-      'icons': {
-        'theme': 'fa-solid fa-sm',
-        'parentNode': 'fa-user-tie',
-        'expandToUp': 'fa-angles-up',
-        'collapseToDown': 'fa-angles-down',
-        'collapseToLeft': 'fa-angles-left',
-        'expandToRight': 'fa-angles-right',
-        'collapsed': 'fa-circle-plus',
-        'expanded': 'fa-circle-minus'
-      }
-    });
-
-    $('#btn-filter-node').on('click', function() {
-      filterNodes($('#key-word').val());
-    });
-
-    $('#btn-cancel').on('click', function() {
-      clearFilterResult();
-    });
-
-    $('#key-word').on('keyup', function(event) {
-      if (event.which === 13) {
-        filterNodes(this.value);
-      } else if (event.which === 8 && this.value.length === 0) {
-        clearFilterResult();
-      }
-    });
-
-  });
-  </script>
+    </script>
   </body>
 </html>

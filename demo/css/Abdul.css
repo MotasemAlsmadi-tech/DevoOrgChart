@@ -14,7 +14,7 @@
     font-size: 1rem;
   }
 
-  input#key-word {
+  #edit-panel input {
     background: #f4f4f42b;
     border: none;
     border-radius: 15px;
@@ -25,12 +25,12 @@
     /* border: 1px solid white; */
   }
 
-  input#key-word::placeholder {
+  #edit-panel input::placeholder {
     color: #F1F1F1;
     padding-left: 10px;
   }
 
-  input#key-word:focus {
+  #edit-panel input:focus {
     outline: 2px solid white;
   }
 
@@ -133,11 +133,11 @@
     background-color: #aaa;
   }
 
-  .orgchart .first .title {
+  .orgchart .first-level .title {
     background-color: #0C5659;
   }
 
-  .orgchart .first .content {
+  .orgchart .first-level .content {
     background-color: white;
   }
 
