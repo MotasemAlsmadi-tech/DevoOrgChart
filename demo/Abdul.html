@@ -171,8 +171,13 @@
           $("#selected-node").val($(this).children(".title").text());
         });
 
+        // disable the reset and cancel buttons when there are no funtion
+        $("#btn-reset").prop("disabled", true);
+        $("#btn-cancel").prop("disabled", true);
+
         // Report path functionality
         $("#btn-report-path").on("click", function () {
+          $("#btn-reset").prop("disabled", false);
           var $selected = $("#chart-container").find(".node.focused");
           if ($selected.length) {
             $selected
@@ -196,6 +201,7 @@
                 }
               });
             $(this).prop("disabled", true);
+            // $("#btn-reset").prop("disabled", false);
           } else {
             alert("please select the node firstly");
           }
@@ -203,6 +209,14 @@
 
         // clear report path function
         $("#btn-reset").on("click", function () {
+          resetChart();
+          clearFilterResult();
+          $("#key-word").val("");
+          $("#btn-cancel").prop("disabled", true);
+          $("#btn-reset").prop("disabled", true);
+        });
+        // Define the resetChart function
+        function resetChart() {
           $("#chart-container")
             .find(".hidden")
             .removeClass("hidden")
@@ -218,10 +232,11 @@
             );
           $("#btn-report-path").prop("disabled", false);
           $("#selected-node").val("");
-        });
+        }
 
         // Filter functionality
         function filterNodes(keyWord) {
+          $("#btn-cancel").prop("disabled", false);
           if (!keyWord.length) {
             window.alert("Please type key word firstly.");
             return;
@@ -261,6 +276,7 @@
                   .addClass("isChildrenCollapsed");
               }
             });
+            // $("#btn-cancel").prop("disabled", flase);
             loopChart($chart.find(".hierarchy:first"));
           }
         }
@@ -282,12 +298,17 @@
         }
 
         $("#btn-filter-node").on("click", function () {
-          filterNodes($("#key-word").val());
+          var keyword = $("#key-word").val().toLowerCase();
+          filterNodes(keyword);
         });
 
         $("#btn-cancel").on("click", function () {
           clearFilterResult();
+          resetChart();
           $("#key-word").val("");
+          $("#selected-node").val("");
+          $("#btn-cancel").prop("disabled", true);
+          $("#btn-reset").prop("disabled", true);
         });
 
         $("#key-word").on("keyup", function (event) {
@@ -295,6 +316,7 @@
             filterNodes(this.value);
           } else if (event.which === 8 && this.value.length === 0) {
             clearFilterResult();
+            resetChart();
           }
         });
 
